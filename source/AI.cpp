@@ -1029,17 +1029,15 @@ void AI::CircleAround(Ship &ship, Command &command, const Ship &target)
 	if(direction.Length() > 200.)
 	{
 		// get closer
-		command.SetTurn(TurnToward(ship, direction));
-		if(ship.Facing().Unit().Dot(direction) >= 0.)
-			command |= Command::FORWARD;
+		MoveTo(ship, command, target.Position() + 120*target.Velocity(), 200., 2.);
 	}
 	else
 	{
 		// try to match course
 		Point delta = target.Velocity() - ship.Velocity();
 		// We want to cancel out that delta. From testing, geting to 0 is not
-		// possible, but most ships should be able to get within .03 quite quickly
-		if(delta.Length() > .03)
+		// possible, but most ships should be able to get within .03 quite quickly 
+		if(delta.Length() > .25)
 		{
 			auto dot = ship.Facing().Unit().Dot(delta.Unit());
 			// don't turn if close enough
