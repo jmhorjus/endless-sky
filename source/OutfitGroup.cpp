@@ -14,6 +14,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "Outfit.h"
 #include "DataNode.h"
+#include "Format.h"
 #include "GameData.h"
 #include "Random.h"
 
@@ -77,6 +78,17 @@ const std::map<int, int> *OutfitGroup::Find(const Outfit *outfit) const
 	if (iter != outfits.end())
 		return &iter->second;
 	return nullptr;
+}
+
+
+
+double OutfitGroup::GetTotalAttribute(std::string attribute) const
+{
+	// Get the total value of an attribute (such as mass) over every outfit. 
+	double value = 0;
+	for (auto it = begin(); it != end(); ++it)
+		value += it.GetOutfit()->Get(attribute) * it.GetQuantity();
+	return value;
 }
 
 
@@ -373,11 +385,22 @@ int64_t OutfitGroup::iterator::GetTotalCost() const
 
 
 
-int64_t OutfitGroup::iterator::GetCostPerOutfit() const
+double OutfitGroup::iterator::GetCostRatio() const
 {
-	return CostFunction(GetOutfit(), GetAge());
+	return CostFunction(GetAge());
 }
 
+
+
+std::string OutfitGroup::iterator::GetCostRatioString() const
+{
+	int64_t maxCost = myGroup->GetCost(GetOutfit(), 1, false);
+	int64_t minCost = myGroup->GetCost(GetOutfit(), 1, true);
+	int64_t baseCost = GetOutfit()->Cost();
+	if (minCost == maxCost)
+		return Format::Percent(minCost, baseCost);
+	return Format::Percent(minCost, baseCost) + "-" + Format::Percent(maxCost, baseCost);
+}
 
 
 // OutfitGroup functions that return iterators.
