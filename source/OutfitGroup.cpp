@@ -24,7 +24,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 int64_t OutfitGroup::CostFunction(const Outfit *outfit, int age, double minValue, double lossPerDay)
 {
-	if (outfit->Get("ageless"))
+	if (outfit->Get("ageless") || outfit->Category() == "Ammunition")
 		return outfit->Cost();
 	return static_cast<int64_t>(outfit->Cost() * std::max(minValue, 1. - (lossPerDay * age)));
 }
@@ -298,6 +298,8 @@ OutfitGroup::iterator::iterator (const OutfitGroup* group, bool begin)
 	}
 	else
 	{
+		outerIter = myGroup->outfits.end();
+		innerIter = outerIter->second.begin();
 		isEnd = true;
 	}
 }
