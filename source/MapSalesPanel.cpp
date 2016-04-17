@@ -68,6 +68,8 @@ MapSalesPanel::MapSalesPanel(const MapPanel &panel, bool isOutfitters)
 	isOutfitters(isOutfitters)
 {
 	SetCommodity(SHOW_SPECIAL);
+	if(!isOutfitters)
+		swizzle = GameData::PlayerGovernment()->GetSwizzle();
 }
 
 
@@ -115,8 +117,8 @@ bool MapSalesPanel::KeyDown(SDL_Keycode key, Uint16 mod, const Command &command)
 	}
 	else if(key == SDLK_PAGEUP || key == SDLK_PAGEDOWN)
 	{
-		scroll += (Screen::Height() - 100) * ((key == SDLK_PAGEUP) - (key == SDLK_PAGEDOWN));
-		scroll = min(0, max(-maxScroll, scroll));
+		scroll += static_cast<double>((Screen::Height() - 100) * ((key == SDLK_PAGEUP) - (key == SDLK_PAGEDOWN)));
+		scroll = min(0., max(-maxScroll, scroll));
 	}
 	else if((key == SDLK_DOWN || key == SDLK_UP) && !zones.empty())
 	{
@@ -206,10 +208,10 @@ bool MapSalesPanel::Hover(int x, int y)
 
 
 
-bool MapSalesPanel::Drag(int dx, int dy)
+bool MapSalesPanel::Drag(double dx, double dy)
 {
 	if(isDragging)
-		scroll = min(0, max(-maxScroll, scroll + dy));
+		scroll = min(0., max(-maxScroll, scroll + dy));
 	else
 		return MapPanel::Drag(dx, dy);
 	
@@ -218,10 +220,10 @@ bool MapSalesPanel::Drag(int dx, int dy)
 
 
 
-bool MapSalesPanel::Scroll(int dx, int dy)
+bool MapSalesPanel::Scroll(double dx, double dy)
 {
 	if(isDragging)
-		scroll = min(0, max(-maxScroll, scroll + 50 * dy));
+		scroll = min(0., max(-maxScroll, scroll + 50 * dy));
 	else
 		return MapPanel::Scroll(dx, dy);
 	

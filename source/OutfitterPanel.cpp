@@ -81,6 +81,7 @@ void OutfitterPanel::Step()
 			"\tAs in the trading panel, you can hold down Shift or Control "
 			"to buy 5 or 20 of an outfit at once, or both keys to buy 100."));
 	}
+	ShopPanel::Step();
 }
 
 
@@ -166,9 +167,10 @@ bool OutfitterPanel::DrawItem(const string &name, const Point &point, int scroll
 			OUTFIT_SIZE / 2 - 24);
 		font.Draw(count, pos, bright);
 	}
-	else if(!outfitter.Has(outfit) && !available[outfit])
+	else if(!outfitter.Has(outfit))
 	{
-		static const string message = "(not sold here)";
+		string message = (available[outfit] ?
+			"in stock: " + to_string(available[outfit]) : "(not sold here)");
 		Point pos = point + Point(
 			OUTFIT_SIZE / 2 - 20 - font.Width(message),
 			OUTFIT_SIZE / 2 - 24);
@@ -213,21 +215,19 @@ bool OutfitterPanel::CanBuy() const
 	if(!planet || !selectedOutfit || !playerShip)
 		return false;
 	
-	// If you have this in your cargo hold, installing it is free.
-	if(player.Cargo().Get(selectedOutfit))
-		return true;
-	
-	if(!(outfitter.Has(selectedOutfit) || available[selectedOutfit]))
+	bool isInCargo = player.Cargo().Get(selectedOutfit);
+	if(!(outfitter.Has(selectedOutfit) || available[selectedOutfit] || isInCargo))
 		return false;
 	
 	int mapSize = selectedOutfit->Get("map");
 	if(mapSize > 0 && HasMapped(mapSize))
 		return false;
 	
-	if(HasLicense(selectedOutfit->Name()))
+	// If you have this in your cargo hold, installing it is free.
+	if(selectedOutfit->Cost() > player.Accounts().Credits() && !isInCargo)
 		return false;
 	
-	if(selectedOutfit->Cost() > player.Accounts().Credits())
+	if(HasLicense(selectedOutfit->Name()))
 		return false;
 	
 	for(const Ship *ship : playerShips)

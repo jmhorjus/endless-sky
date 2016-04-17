@@ -130,7 +130,7 @@ bool MapPanel::Click(int x, int y)
 
 
 
-bool MapPanel::Drag(int dx, int dy)
+bool MapPanel::Drag(double dx, double dy)
 {
 	center += Point(dx, dy) / Zoom();
 	return true;
@@ -138,12 +138,12 @@ bool MapPanel::Drag(int dx, int dy)
 
 
 
-bool MapPanel::Scroll(int dx, int dy)
+bool MapPanel::Scroll(double dx, double dy)
 {
 	// The mouse should be pointing to the same map position before and after zooming.
 	Point mouse = UI::GetMouse();
 	Point anchor = mouse / Zoom() - center;
-	if(dy > 0)
+	if(dy > 0.)
 		ZoomMap();
 	else
 		UnzoomMap();
@@ -277,19 +277,32 @@ void MapPanel::Select(const System *system)
 
 const Planet *MapPanel::Find(const string &name)
 {
+	int bestIndex = 9999;
 	for(const auto &it : GameData::Systems())
-		if(player.HasVisited(&it.second) && Contains(it.first, name))
+		if(player.HasVisited(&it.second))
 		{
-			selectedSystem = &it.second;
-			center = Zoom() * (Point() - selectedSystem->Position());
-			return nullptr;
+			int index = Search(it.first, name);
+			if(index >= 0 && index < bestIndex)
+			{
+				bestIndex = index;
+				selectedSystem = &it.second;
+				center = Zoom() * (Point() - selectedSystem->Position());
+				if(!index)
+					return nullptr;
+			}
 		}
 	for(const auto &it : GameData::Planets())
-		if(player.HasVisited(it.second.GetSystem()) && Contains(it.first, name))
+		if(player.HasVisited(it.second.GetSystem()))
 		{
-			selectedSystem = it.second.GetSystem();
-			center = Zoom() * (Point() - selectedSystem->Position());
-			return &it.second;
+			int index = Search(it.first, name);
+			if(index >= 0 && index < bestIndex)
+			{
+				bestIndex = index;
+				selectedSystem = it.second.GetSystem();
+				center = Zoom() * (Point() - selectedSystem->Position());
+				if(!index)
+					return &it.second;
+			}
 		}
 	return nullptr;
 }
@@ -346,11 +359,11 @@ bool MapPanel::IsSatisfied(const Mission &mission) const
 
 
 
-bool MapPanel::Contains(const string &str, const string &sub)
+int MapPanel::Search(const string &str, const string &sub)
 {
 	auto it = search(str.begin(), str.end(), sub.begin(), sub.end(),
 		[](char a, char b) { return toupper(a) == toupper(b); });
-	return (it != str.end());
+	return (it == str.end() ? -1 : it - str.begin());
 }
 
 

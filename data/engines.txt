@@ -33,7 +33,7 @@ outfit "Ionic Afterburner"
 	"afterburner energy" 5.1
 	"afterburner heat" 12.0
 	"afterburner effect" "ionic afterburner"
-	description "The ionic afterburner was designed by the Syndicate to compensate for the primary weakness of an ordinary afterburner: namely, that it consumes hyperspace fuel at a prodigious rate. Ionic afterburners instead use a small amount of fuel combined with a large burst of energy from your ships batteries to achieve the same effect."
+	description "The ionic afterburner was designed by the Syndicate to compensate for the primary weakness of an ordinary afterburner: namely, that it consumes hyperspace fuel at a prodigious rate. Ionic afterburners instead use a small amount of fuel combined with a large burst of energy from your ship's batteries to achieve the same effect."
 
 
 outfit "X1700 Ion Thruster"
@@ -474,15 +474,3 @@ outfit "AR120 Reverse Thruster"
 	"reverse thrusting energy" 1.8
 	"reverse thrusting heat" 3.5
 	description "For pilots who want to be able to pull fancy tricks that most ships are not capable of emulating, a reverse thruster allows a ship to accelerate backwards, without needing to turn around. Because a reverse thruster must be facing forwards, it must be installed in the weapon section of your ship instead of the engine section."
-
-# Legacy support (renamed to "AR120 Reverse Thruster").
-outfit "Reverse Thruster"
-	category "Engines"
-	"cost" 140000
-	thumbnail "outfit/reverse thruster"
-	"mass" 22
-	"outfit space" -22
-	"weapon capacity" -22
-	"reverse thrust" 15.4
-	"reverse thrusting energy" 1.8
-	"reverse thrusting heat" 3.5

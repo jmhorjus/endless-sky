@@ -34,6 +34,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 class Government;
 class Outfit;
 class PlayerInfo;
+class StellarObject;
 
 
 
@@ -76,6 +77,7 @@ private:
 	void ThreadEntryPoint();
 	void CalculateStep();
 	void AddSprites(const Ship &ship, const Point &position, const Point &velocity);
+	void AddSprites(const Ship &ship, const Point &position, const Point &velocity, const Point &unit, double cloak);
 	
 	void DoGrudge(const std::shared_ptr<Ship> &target, const Government *attacker);
 	
@@ -100,6 +102,18 @@ private:
 		bool isEnemy;
 	};
 	
+	class Label {
+	public:
+		Label(const Point &position, const StellarObject &object);
+		
+		Point position;
+		double radius;
+		std::string name;
+		std::string government;
+		Color color;
+		int hostility = 0;
+	};
+	
 	
 private:
 	PlayerInfo &player;
@@ -111,9 +125,9 @@ private:
 	std::mutex swapMutex;
 	
 	Point center;
-	bool calcTickTock;
-	bool drawTickTock;
-	bool terminate;
+	bool calcTickTock = false;
+	bool drawTickTock = false;
+	bool terminate = false;
 	bool wasActive = false;
 	DrawList draw[2];
 	Radar radar[2];
@@ -127,9 +141,10 @@ private:
 	Point targetUnit;
 	EscortDisplay escorts;
 	std::vector<Status> statuses;
+	std::vector<Label> labels;
 	std::vector<std::pair<const Outfit *, int>> ammo;
 	
-	int step;
+	int step = 0;
 	
 	std::list<std::shared_ptr<Ship>> ships;
 	std::list<Projectile> projectiles;
@@ -144,17 +159,17 @@ private:
 	std::map<const Government *, std::weak_ptr<const Ship>> grudge;
 	
 	AsteroidField asteroids;
-	double flash;
-	bool doFlash;
-	bool wasLeavingHyperspace;
+	double flash = 0.;
+	bool doFlash = false;
+	bool doEnter = false;
 	
 	bool doClick = false;
 	Command clickCommands;
 	Point clickPoint;
 	
-	double load;
-	int loadCount;
-	double loadSum;
+	double load = 0.;
+	int loadCount = 0;
+	double loadSum = 0.;
 };
 
 

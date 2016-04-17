@@ -312,7 +312,7 @@ bool LoadPanel::Click(int x, int y)
 		return DoKey(key);
 	
 	// The first row of each panel is y = -160 to -140.
-	if(y < -160)
+	if(y < -160 || y >= (-160+14*20))
 		return false;
 	
 	if(x >= -470 && x < -250)
@@ -360,21 +360,21 @@ bool LoadPanel::Hover(int x, int y)
 
 
 
-bool LoadPanel::Drag(int dx, int dy)
+bool LoadPanel::Drag(double dx, double dy)
 {
 	auto it = files.find(selectedPilot);
 	if(sideHasFocus)
-		sideScroll = max(0, min(static_cast<int>(20 * files.size()) - 280, sideScroll - dy));
+		sideScroll = max(0., min(20. * files.size() - 280., sideScroll - dy));
 	else if(!selectedPilot.empty() && it != files.end())
-		centerScroll = max(0, min(static_cast<int>(20 * it->second.size()) - 280, centerScroll - dy));
+		centerScroll = max(0., min(20. * it->second.size() - 280., centerScroll - dy));
 	return true;
 }
 
 
 
-bool LoadPanel::Scroll(int dx, int dy)
+bool LoadPanel::Scroll(double dx, double dy)
 {
-	return Drag(50 * dx, 50 * dy);
+	return Drag(50. * dx, 50. * dy);
 }
 
 

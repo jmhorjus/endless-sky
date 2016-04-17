@@ -64,7 +64,7 @@ BoardingPanel::BoardingPanel(PlayerInfo &player, const shared_ptr<Ship> &victim)
 	// You cannot plunder hand to hand weapons, because they are kept in the
 	// crew's quarters, not mounted on the exterior of the ship.
 	for(const auto &it : victim->Outfits())
-		if(it.first->Category() != "Hand to Hand")
+		if(!it.first->Get("unplunderable"))
 			plunder.emplace_back(it.first, it.second);
 	
 	sort(plunder.begin(), plunder.end());
@@ -229,8 +229,8 @@ bool BoardingPanel::KeyDown(SDL_Keycode key, Uint16 mod, const Command &command)
 				++selected;
 			
 			// Scroll down at least far enough to view the current item.
-			int minimumScroll = max(0, static_cast<int>(20 * selected - 200));
-			int maximumScroll = static_cast<int>(20 * selected);
+			double minimumScroll = max(0., 20. * selected - 200.);
+			double maximumScroll = 20. * selected;
 			scroll = max(minimumScroll, min(maximumScroll, scroll));
 		}
 	}
@@ -321,7 +321,7 @@ bool BoardingPanel::KeyDown(SDL_Keycode key, Uint16 mod, const Command &command)
 					victim->SetParent(you);
 				else
 					for(const shared_ptr<Ship> &ship : player.Ships())
-						if(ship->CanHoldFighter(*victim))
+						if(ship->CanCarry(*victim))
 						{
 							victim->SetParent(ship);
 							break;
@@ -373,21 +373,21 @@ bool BoardingPanel::Click(int x, int y)
 
 
 
-bool BoardingPanel::Drag(int dx, int dy)
+bool BoardingPanel::Drag(double dx, double dy)
 {
 	// The list is 240 pixels tall, and there are 10 pixels padding on the top
 	// and the bottom, so:
-	int maximumScroll = max(0, static_cast<int>(20 * plunder.size() - 220));
-	scroll = max(0, min(maximumScroll, scroll + dy));
+	double maximumScroll = max(0., 20. * plunder.size() - 220.);
+	scroll = max(0., min(maximumScroll, scroll - dy));
 	
 	return true;
 }
 
 
 
-bool BoardingPanel::Scroll(int dx, int dy)
+bool BoardingPanel::Scroll(double dx, double dy)
 {
-	return Drag(dx, dy * -50);
+	return Drag(dx, dy * -50.);
 }
 
 
@@ -440,7 +440,7 @@ bool BoardingPanel::CanCapture() const
 		
 		// Check if any ship in your fleet can carry this ship.
 		for(const shared_ptr<Ship> &ship : player.Ships())
-			if(ship->CanHoldFighter(*victim))
+			if(ship->CanCarry(*victim))
 				return true;
 		
 		return false;
