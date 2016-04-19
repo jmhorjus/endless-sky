@@ -251,16 +251,16 @@ void ShipInfoDisplay::UpdateAttributes(const Ship &ship)
 		attributesHeight += 20;
 	}
 	
-	if(ship.DroneBaysFree())
+	if(ship.BaysFree(false))
 	{
 		attributeLabels.push_back("drone bays:");
-		attributeValues.push_back(to_string(ship.DroneBaysFree()));
+		attributeValues.push_back(to_string(ship.BaysFree(false)));
 		attributesHeight += 20;
 	}
-	if(ship.FighterBaysFree())
+	if(ship.BaysFree(true))
 	{
 		attributeLabels.push_back("fighter bays:");
-		attributeValues.push_back(to_string(ship.FighterBaysFree()));
+		attributeValues.push_back(to_string(ship.BaysFree(true)));
 		attributesHeight += 20;
 	}
 	
@@ -271,7 +271,9 @@ void ShipInfoDisplay::UpdateAttributes(const Ship &ship)
 	attributesHeight += 30;
 	
 	tableLabels.push_back("idle:");
-	energyTable.push_back(Format::Number(60. * attributes.Get("energy generation")));
+	energyTable.push_back(Format::Number(
+		60. * (attributes.Get("energy generation")
+			+ attributes.Get("solar collection"))));
 	heatTable.push_back(Format::Number(
 		60. * (attributes.Get("heat generation") - attributes.Get("cooling"))));
 	attributesHeight += 20;
@@ -296,6 +298,11 @@ void ShipInfoDisplay::UpdateAttributes(const Ship &ship)
 	tableLabels.push_back("firing:");
 	energyTable.push_back(Format::Number(-60. * firingEnergy));
 	heatTable.push_back(Format::Number(60. * firingHeat));
+	attributesHeight += 20;
+	tableLabels.push_back("repairing:");
+	double repairEnergy = attributes.Get("shield energy") + attributes.Get("hull energy");
+	energyTable.push_back(Format::Number(-60. * repairEnergy));
+	heatTable.push_back("0");
 	attributesHeight += 20;
 	tableLabels.push_back("max:");
 	energyTable.push_back(Format::Number(attributes.Get("energy capacity")));
@@ -360,3 +367,4 @@ void ShipInfoDisplay::UpdateOutfits(const Ship &ship)
 	saleValues.push_back(Format::Number(totalValue) + " credits");
 	saleHeight += 20;
 }
+

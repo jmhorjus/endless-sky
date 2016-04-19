@@ -590,6 +590,66 @@ ship "Carrier"
 
 
 
+ship "Class C Freighter"
+	sprite "ship/bulk freighter"
+	attributes
+		category "Heavy Warship"
+		"cost" 11400000
+		"shields" 13500
+		"hull" 7600
+		"required crew" 18
+		"bunks" 43
+		"mass" 810
+		"drag" 16.4
+		"heat dissipation" .5
+		"fuel capacity" 600
+		"cargo space" 20
+		"outfit space" 400
+		"weapon capacity" 140
+		"engine capacity" 85
+		weapon
+			"blast radius" 200
+			"shield damage" 2000
+			"hull damage" 1000
+			"hit force" 3000
+	outfits
+		"Heavy Laser Turret" 2
+		"Heavy Anti-Missile Turret" 2
+		
+		"Fission Reactor"
+		"LP072a Battery Pack"
+		"D94-YV Shield Generator"
+		
+		"X3700 Ion Thruster"
+		"X3200 Ion Steering"
+		"Scram Drive"
+		
+	engine -22 198
+	engine 22 198
+	turret -12 -155 "Heavy Laser Turret"
+	turret 30 175 "Heavy Laser Turret"
+	turret 12 -155 "Heavy Anti-Missile Turret"
+	turret -30 175 "Heavy Anti-Missile Turret"
+	drone -66 -115 left
+	drone -66 -65 left
+	drone -66 -15 left
+	drone -66 35 left
+	drone -66 85 left
+	drone -66 135 left
+	drone 66 -115 right
+	drone 66 -65 right
+	drone 66 -15 right
+	drone 66 35 right
+	drone 66 85 right
+	drone 66 135 right
+	explode "small explosion" 15
+	explode "medium explosion" 25
+	explode "big explosion" 35
+	explode "huge explosion" 20
+	description `The Class C "Freighter" is a stealth warship designed by the Syndicate for baiting pirates with the offer of a seemingly helpless, ordinary bulk freighter. Inside, its cargo space has all been converted into drone bays, allowing it to carry a dozen combat drones.`
+
+
+
 ship "Clipper"
 	sprite "ship/clipper"
 	attributes
@@ -645,7 +705,7 @@ ship "Combat Drone"
 	attributes
 		category "Drone"
 		"cost" 83000
-		"hull" 500
+		"hull" 700
 		"mass" 20
 		"drag" .59
 		"heat dissipation" .9
@@ -671,7 +731,7 @@ ship "Combat Drone"
 	engine 9 29
 	gun 0 -29 "Beam Laser"
 	explode "tiny explosion" 15
-	description "Combat drones are pilotless attack ships used primarily by the Republic Navy. Although very weak and easy to destroy, they can be very effective in large numbers."
+	description "Combat drones are pilotless attack ships used primarily by the Republic Navy. Although very weak and easy to destroy, they can be very effective in large numbers. Because drones do not need a cockpit, they can be filled entirely with equipment and solid metal, which makes their hulls stronger than other small ships."
 
 
 
@@ -796,7 +856,7 @@ ship "Dagger"
 	attributes
 		category "Fighter"
 		"cost" 129000
-		"shields" 900
+		"shields" 1000
 		"hull" 300
 		"required crew" 1
 		"bunks" 1
@@ -1525,7 +1585,7 @@ ship "Lance"
 	attributes
 		category "Fighter"
 		"cost" 93000
-		"shields" 700
+		"shields" 800
 		"hull" 400
 		"required crew" 1
 		"bunks" 1
@@ -1699,9 +1759,9 @@ ship "Marauder Arrow"
 		
 	engine -8 57
 	engine 8 57
-	gun -6 -36 "Sidewinder Missile Launcher"
-	gun 6 -36 "Sidewinder Missile Launcher"
-	turret 0 15 "Anti-Missile Turret"
+	gun -6 -36 "Heavy Laser"
+	gun 6 -36 "Heavy Laser"
+	turret 0 15 "Quad Blaster Turret"
 	explode "tiny explosion" 12
 	explode "small explosion" 18
 	explode "medium explosion" 6
@@ -1709,11 +1769,7 @@ ship "Marauder Arrow"
 
 
 
-<<<<<<< HEAD
-ship "Marauder Arrow (Engines)"
-=======
 ship "Marauder Arrow" "Marauder Arrow (Engines)"
->>>>>>> 3731580485aba65fc7a53eb0b123b6ecee27db17
 	sprite "ship/marrowe"
 	attributes
 		category "Interceptor"
@@ -1748,8 +1804,8 @@ ship "Marauder Arrow" "Marauder Arrow (Engines)"
 		
 	engine -10 57
 	engine 10 57
-	gun -6 -36 "Sidewinder Missile Launcher"
-	gun 6 -36 "Sidewinder Missile Launcher"
+	gun -6 -36 "Heavy Laser"
+	gun 6 -36 "Heavy Laser"
 	turret 0 15 "Anti-Missile Turret"
 	explode "tiny explosion" 12
 	explode "small explosion" 18
@@ -1798,7 +1854,7 @@ ship "Marauder Arrow" "Marauder Arrow (Weapons)"
 	gun 6 -36 "Energy Blaster"
 	gun -7 -34 "Energy Blaster"
 	gun 7 -34 "Energy Blaster"
-	turret 0 15 "Anti-Missile Turret"
+	turret 0 15
 	explode "tiny explosion" 12
 	explode "small explosion" 18
 	explode "medium explosion" 6
@@ -1846,8 +1902,8 @@ ship "Marauder Bounder"
 	engine -12 44
 	engine 12 44
 	gun 0 -85 "Particle Cannon"
-	turret -38 7 "Blaster Turret"
-	turret 38 7 "Blaster Turret"
+	turret -38 7 "Quad Blaster Turret"
+	turret 38 7 "Quad Blaster Turret"
 	explode "tiny explosion" 10
 	explode "small explosion" 20
 	explode "medium explosion" 15
@@ -1894,8 +1950,8 @@ ship "Marauder Bounder" "Marauder Bounder (Engines)"
 	engine 0 51
 	engine 12 58
 	gun 0 -85 "Heavy Laser"
-	turret -38 7 "Blaster Turret"
-	turret 38 7 "Blaster Turret"
+	turret -38 7 "Quad Blaster Turret"
+	turret 38 7 "Quad Blaster Turret"
 	explode "tiny explosion" 10
 	explode "small explosion" 20
 	explode "medium explosion" 15
@@ -1943,8 +1999,8 @@ ship "Marauder Bounder" "Marauder Bounder (Weapons)"
 	engine 15 44
 	gun 7 -77 "Modified Blaster"
 	gun -7 -77 "Modified Blaster"
-	turret -37 4 "Blaster Turret"
-	turret 37 4 "Blaster Turret"
+	turret -37 4 "Heavy Laser Turret"
+	turret 37 4 "Heavy Laser Turret"
 	explode "tiny explosion" 10
 	explode "small explosion" 20
 	explode "medium explosion" 15
@@ -2281,7 +2337,7 @@ ship "Marauder Firebird" "Marauder Firebird (Weapons)"
 	explode "small explosion" 36
 	explode "medium explosion" 24
 	explode "big explosion" 8
-	description "The Medium Warship with one of the heaviest armaments possible, just got heavier.  More outfit space, giant gun ports, extra hull plating and shield emitters - this blast from the past will make it's targets history."
+	description "The Medium Warship with one of the heaviest armaments possible, just got heavier.  More outfit space, giant gun ports, extra hull plating and shield emitters - this blast from the past will make its targets history."
 
 
 
@@ -2435,10 +2491,10 @@ ship "Marauder Leviathan" "Marauder Leviathan (Engines)"
 
 	engine -27 125
 	engine 27 125
-	gun -50 -23 "Particle Cannon"
-	gun 50 -23 "Particle Cannon"
-	gun -38 -34 "Particle Cannon"
-	gun 38 -34 "Particle Cannon"
+	gun -50 -23 "Electron Beam"
+	gun 50 -23 "Electron Beam"
+	gun -38 -34 "Electron Beam"
+	gun 38 -34 "Electron Beam"
 	turret -16 -48 "Quad Blaster Turret"
 	turret 16 -48 "Quad Blaster Turret"
 	turret -25 10 "Quad Blaster Turret"
@@ -2640,27 +2696,33 @@ ship "Marauder Manta" "Marauder Manta (Weapons)"
 			"hull damage" 450
 			"hit force" 1350
 	outfits
-		"Particle Cannon" 4
+		"Particle Cannon" 2
 		"Meteor Missile Launcher" 2
+		"Proton Gun" 2
+		"Heavy Anti-Missile Turret"
 		"Meteor Missile" 70
-		
-		"RT-I Radiothermal"
-		"LP144a Battery Pack"
+
+		Supercapacitor
+		"Liquid Nitrogen Cooler"
 		"D14-RN Shield Generator"
-		
-		"X3700 Ion Thruster"
-		"X3200 Ion Steering"
-		"Hyperdrive"
+		"Fission Reactor"
+		"LP072a Battery Pack"
+		"LP036a Battery Pack"
+
+		"A250 Atomic Thruster"
+		"A375 Atomic Steering"
+		Hyperdrive
+		"Laser Rifle" 11
 		
 	engine -33.5 38
 	engine 33.5 38
 	gun -20 -35 "Particle Cannon"
 	gun 20 -35 "Particle Cannon"
-	gun -27 -35 "Particle Cannon"
-	gun 27 -35 "Particle Cannon"
+	gun -27 -35 "Proton Gun"
+	gun 27 -35 "Proton Gun"
 	gun -66 -34 "Meteor Missile Launcher"
 	gun 66 -34 "Meteor Missile Launcher"
-	turret 0 -29
+	turret 0 -29 "Heavy Anti-Missile Turret"
 	explode "tiny explosion" 10
 	explode "small explosion" 20
 	explode "medium explosion" 15
@@ -3110,7 +3172,7 @@ ship "Marauder Splinter" "Marauder Splinter (Weapons)"
 	explode "small explosion" 36
 	explode "medium explosion" 24
 	explode "big explosion" 8
-	description "This Splinter has had extensive modification to it's weapons space, with two new forward hard points on either side of the bridge.  The previous owner has covered large sections of the hull with extra shield modulators, hull plating and foils.  Much of the stock cargo space has been converted to outfit, weapons and engines space, coupled with streamlining of existing internal systems make the prospect of meeting this flexible war machine in an uninhabited system seem pretty unappealing."
+	description "This Splinter has had extensive modification to its weapons space, with two new forward hard points on either side of the bridge.  The previous owner has covered large sections of the hull with extra shield modulators, hull plating and foils.  Much of the stock cargo space has been converted to outfit, weapons and engines space, coupled with streamlining of existing internal systems make the prospect of meeting this flexible war machine in an uninhabited system seem pretty unappealing."
 
 
 

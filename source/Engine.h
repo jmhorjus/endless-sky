@@ -34,6 +34,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 class Government;
 class Outfit;
 class PlayerInfo;
+class StellarObject;
 
 
 
@@ -76,6 +77,7 @@ private:
 	void ThreadEntryPoint();
 	void CalculateStep();
 	void AddSprites(const Ship &ship, const Point &position, const Point &velocity);
+	void AddSprites(const Ship &ship, const Point &position, const Point &velocity, const Point &unit, double cloak);
 	
 	void DoGrudge(const std::shared_ptr<Ship> &target, const Government *attacker);
 	
@@ -98,6 +100,18 @@ private:
 		double hull;
 		double radius;
 		bool isEnemy;
+	};
+	
+	class Label {
+	public:
+		Label(const Point &position, const StellarObject &object);
+		
+		Point position;
+		double radius;
+		std::string name;
+		std::string government;
+		Color color;
+		int hostility = 0;
 	};
 	
 	
@@ -127,6 +141,7 @@ private:
 	Point targetUnit;
 	EscortDisplay escorts;
 	std::vector<Status> statuses;
+	std::vector<Label> labels;
 	std::vector<std::pair<const Outfit *, int>> ammo;
 	
 	int step = 0;

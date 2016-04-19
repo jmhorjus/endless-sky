@@ -51,8 +51,8 @@ public:
 	
 	// Accessor functions for various attributes.
 	int Lifetime() const;
-	int Reload() const;
-	int BurstReload() const;
+	double Reload() const;
+	double BurstReload() const;
 	int BurstCount() const;
 	int Homing() const;
 	
@@ -64,6 +64,7 @@ public:
 	bool IsStreamed() const;
 	
 	double Velocity() const;
+	double RandomVelocity() const;
 	double Acceleration() const;
 	double Drag() const;
 	
@@ -85,11 +86,17 @@ public:
 	double HullDamage() const;
 	double HeatDamage() const;
 	double IonDamage() const;
+	double DisruptionDamage() const;
+	double SlowingDamage() const;
 	
 	double Piercing() const;
 	
 	double TotalLifetime() const;
 	double Range() const;
+	
+	
+private:
+	double TotalDamage(int index) const;
 	
 	
 private:
@@ -112,15 +119,16 @@ private:
 	
 	// Attributes.
 	int lifetime = 0;
-	int reload = 0;
-	int burstReload = 0;
-	int burstCount = 0;
+	double reload = 1.;
+	double burstReload = 1.;
+	int burstCount = 1;
 	int homing = 0;
 	
-	int missileStrength = 0.;
-	int antiMissile = 0.;
+	int missileStrength = 0;
+	int antiMissile = 0;
 	
 	double velocity = 0.;
+	double randomVelocity = 0.;
 	double acceleration = 0.;
 	double drag = 0.;
 	
@@ -135,20 +143,20 @@ private:
 	double splitRange = 0.;
 	double triggerRadius = 0.;
 	double blastRadius = 0.;
-	
-	double shieldDamage = 0.;
-	double hullDamage = 0.;
-	double heatDamage = 0.;
-	double ionDamage = 0.;
 	double hitForce = 0.;
+	
+	static const int SHIELD_DAMAGE = 0;
+	static const int HULL_DAMAGE = 1;
+	static const int HEAT_DAMAGE = 2;
+	static const int ION_DAMAGE = 3;
+	static const int DISRUPTION_DAMAGE = 4;
+	static const int SLOWING_DAMAGE = 5;
+	mutable double damage[6] = {0., 0., 0., 0., 0., 0.};
 	
 	double piercing = 0.;
 	
 	// Cache the calculation of these values, for faster access.
-	mutable double totalShieldDamage = -1.;
-	mutable double totalHullDamage = -1.;
-	mutable double totalHeatDamage = -1.;
-	mutable double totalIonDamage = -1.;
+	mutable bool calculatedDamage[6] = {false, false, false, false, false, false};
 	mutable double totalLifetime = -1.;
 };
 
@@ -156,8 +164,8 @@ private:
 
 // Inline the accessors because they get called so frequently.
 inline int Weapon::Lifetime() const { return lifetime; }
-inline int Weapon::Reload() const { return reload; }
-inline int Weapon::BurstReload() const { return burstReload; }
+inline double Weapon::Reload() const { return reload; }
+inline double Weapon::BurstReload() const { return burstReload; }
 inline int Weapon::BurstCount() const { return burstCount; }
 inline int Weapon::Homing() const { return homing; }
 
@@ -166,6 +174,7 @@ inline int Weapon::AntiMissile() const { return antiMissile; }
 inline bool Weapon::IsStreamed() const { return isStreamed; }
 
 inline double Weapon::Velocity() const { return velocity; }
+inline double Weapon::RandomVelocity() const { return randomVelocity; }
 inline double Weapon::Acceleration() const { return acceleration; }
 inline double Weapon::Drag() const { return drag; }
 
@@ -183,6 +192,13 @@ inline double Weapon::SplitRange() const { return splitRange; }
 inline double Weapon::TriggerRadius() const { return triggerRadius; }
 inline double Weapon::BlastRadius() const { return blastRadius; }
 inline double Weapon::HitForce() const { return hitForce; }
+
+inline double Weapon::ShieldDamage() const { return TotalDamage(SHIELD_DAMAGE); }
+inline double Weapon::HullDamage() const { return TotalDamage(HULL_DAMAGE); }
+inline double Weapon::HeatDamage() const { return TotalDamage(HEAT_DAMAGE); }
+inline double Weapon::IonDamage() const { return TotalDamage(ION_DAMAGE); }
+inline double Weapon::DisruptionDamage() const { return TotalDamage(DISRUPTION_DAMAGE); }
+inline double Weapon::SlowingDamage() const { return TotalDamage(SLOWING_DAMAGE); }
 
 
 

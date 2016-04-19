@@ -358,6 +358,10 @@ void GameData::WriteEconomy(DataWriter &out)
 		
 		for(const auto &sit : GameData::Systems())
 		{
+			// Skip systems that have no name.
+			if(sit.first.empty() || sit.second.Name().empty())
+				continue;
+			
 			out.WriteToken(sit.second.Name());
 			for(const auto &cit : GameData::Commodities())
 				out.WriteToken(static_cast<int>(sit.second.Supply(cit.name)));
@@ -410,7 +414,8 @@ void GameData::StepEconomy()
 
 void GameData::AddPurchase(const System &system, const string &commodity, int tons)
 {
-	purchases[&system][commodity] += tons;
+	if(tons < 0)
+		purchases[&system][commodity] += tons;
 }
 
 
