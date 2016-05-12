@@ -44,6 +44,14 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 using namespace std;
 
 
+namespace {
+	static const int MAX_RAID_FLEETS = 25;
+	static const int RAID_ATTRACTION_MAX = 500;
+	static const int ATTRACTION_PER_LIGHT_FREIGHTER = 1;
+	static const int ATTRACTION_PER_HEAVY_FREIGHTER = 2;
+	static const int ATTRACTION_CARGO_VALUE_DEVISOR = 250000; // 250k assumes commodity value re-balance.
+}
+
 
 Engine::Engine(PlayerInfo &player)
 	: player(player)
@@ -764,6 +772,7 @@ void Engine::EnterSystem()
 		// Find out how attractive the player's fleet is to pirates. Aside from a
 		// heavy freighter, no single ship should attract extra pirate attention.
 		unsigned attraction = 0;
+		double cargoValue = 0;
 		for(const shared_ptr<Ship> &ship : player.Ships())
 		{
 			if(ship->IsParked())
@@ -771,14 +780,21 @@ void Engine::EnterSystem()
 		
 			const string &category = ship->Attributes().Category();
 			if(category == "Light Freighter")
-				attraction += 1;
+				attraction += ATTRACTION_PER_LIGHT_FREIGHTER;
 			if(category == "Heavy Freighter")
-				attraction += 2;
+				attraction += ATTRACTION_PER_HEAVY_FREIGHTER;
+			
+			// Ships carrying valuable cargo attract attention regardless of type.
+			cargoValue += ship->Cargo().Value(system);
 		}
+		if (cargoValue > ATTRACTION_CARGO_VALUE_DEVISOR/2) //400k per attention   
+			attraction += (cargoValue - ATTRACTION_CARGO_VALUE_DEVISOR/2) / ATTRACTION_CARGO_VALUE_DEVISOR; 
+
 		if(attraction > 2)
 			for(int i = 0; i < 10; ++i)
-				if(Random::Int(200) + 1 < attraction)
-					raidFleet->Place(*system, ships);
+				if(Random::Int(RAID_ATTRACTION_MAX) + 1 < attraction)
+					raidFleet->Place(*system, ships);							
+
 	}
 	
 	projectiles.clear();
