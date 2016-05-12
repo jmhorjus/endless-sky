@@ -89,7 +89,7 @@ trade
 		"vinegar"
 		"wheat"
 		"yams"
-	commodity "Clothing" 140 440
+	commodity "Clothing" 240 640
 		"beach towels"
 		"blankets"
 		"body armor"
@@ -164,7 +164,7 @@ trade
 		"tool steel blanks"
 		"vanadium"
 		"zinc"
-	commodity "Plastic" 240 540
+	commodity "Plastic" 440 940
 		"acetone"
 		"asphalt"
 		"bakelite"
@@ -199,7 +199,7 @@ trade
 		"unplasticized PVC"
 		"vinylesters"
 		"xylene"
-	commodity "Equipment" 330 730
+	commodity "Equipment" 1330 2030
 		"3D printers"
 		"CNC machines"
 		"air conditioners"
@@ -265,7 +265,7 @@ trade
 		"welding torches"
 		"wheelbarrows"
 		"whiskey barrels"
-	commodity "Medical" 430 930
+	commodity "Medical" 3430 4330
 		"antibacterials"
 		"antibiotics"
 		"anti-inflammatories"
@@ -302,7 +302,7 @@ trade
 		"tourniquets"
 		"tranquilizers"
 		"tweezers"
-	commodity "Industrial" 520 920
+	commodity "Industrial" 1520 2220
 		"aniline dyes"
 		"assorted shimstock"
 		"battery acid"
@@ -365,7 +365,7 @@ trade
 		"turret lathes"
 		"vacuum cleaners"
 		"varnish"
-	commodity "Electronics" 590 890
+	commodity "Electronics" 1590 2190
 		"accelerometers"
 		"amplifiers"
 		"batteries"
@@ -423,7 +423,7 @@ trade
 		"vacuum tubes"
 		"voltage converters"
 		"wireless receivers"
-	commodity "Heavy Metals" 610 1310
+	commodity "Heavy Metals" 3610 4610
 		"actinide metals"
 		"barium"
 		"bismuth"
@@ -444,7 +444,7 @@ trade
 		"reactor grade uranium"
 		"thorium"
 		"tungsten"
-	commodity "Luxury Goods" 920 1520
+	commodity "Luxury Goods" 9920 11120
 		"antique swords"
 		"brandy"
 		"champagne"
