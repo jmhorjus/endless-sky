@@ -29,7 +29,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 using namespace std;
 
 namespace {
-	static const int DEFAULT_PAYMENT_MULTIPLIER = 450; // Original value: 150;
+	
+	static const int DEFAULT_PAYMENT_MULTIPLIER = 300; // Original value: 150;
+	static const double FIXED_PAYMENT_BALANCE_MULTIPLIER = 2.;
 	
 	
 	void DoGift(PlayerInfo &player, const Outfit *outfit, int count, int wear, UI *ui)
@@ -324,7 +326,7 @@ MissionAction MissionAction::Instantiate(map<string, string> &subs, int jumps, i
 	
 	result.events = events;
 	result.gifts = gifts;
-	result.payment = payment + (jumps + 1) * payload * paymentMultiplier;
+	result.payment = (payment * FIXED_PAYMENT_BALANCE_MULTIPLIER)  + (jumps + 1) * payload * paymentMultiplier;
 	// Fill in the payment amount if this is the "complete" action (which comes
 	// before all the others in the list).
 	if(trigger == "complete" || result.payment)
