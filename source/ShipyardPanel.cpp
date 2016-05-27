@@ -14,10 +14,12 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "Color.h"
 #include "Dialog.h"
+#include "FillShader.h"
 #include "Font.h"
 #include "FontSet.h"
 #include "Format.h"
 #include "GameData.h"
+#include "InfoPanel.h"
 #include "Planet.h"
 #include "PlayerInfo.h"
 #include "Point.h"
@@ -66,8 +68,12 @@ int ShipyardPanel::DrawPlayerShipInfo(const Point &point) const
 	info.DrawAttributes(drawPoint);
 	drawPoint.Y() += info.AttributesHeight();
 	
+	FillShader::Fill(drawPoint + Point(DETAILS_WIDTH/2,0), Point(DETAILS_WIDTH, 1), COLOR_DIVIDERS);
+	
 	info.DrawOutfits(drawPoint);
 	drawPoint.Y() += info.OutfitsHeight();
+
+	FillShader::Fill(drawPoint + Point(DETAILS_WIDTH/2,0), Point(DETAILS_WIDTH, 1), COLOR_DIVIDERS);
 	
 	info.DrawDescription(drawPoint);
 	drawPoint.Y() += info.DescriptionHeight();
@@ -77,9 +83,38 @@ int ShipyardPanel::DrawPlayerShipInfo(const Point &point) const
 
 
 
+int ShipyardPanel::DrawCargoHoldInfo(const Point &point) const
+{
+	Point drawPoint = point + Point(10,0);
+	
+	drawPoint.Y() += InfoPanel::DrawCargoHold(player.Cargo(), drawPoint , Point(DETAILS_WIDTH - 20, 20), 0, nullptr);	
+	
+	return drawPoint.Y() - point.Y();
+}
+
+
+
+bool ShipyardPanel::HasItem(const string &name) const
+{
+	string modelName = name;
+	bool isJunkyard = false;
+	if (Format::EndsWith(name, Ship::JUNKYARD_SHIP_SUFFIX))
+	{
+		modelName = name.substr(0, name.size() - Ship::JUNKYARD_SHIP_SUFFIX.size());
+		isJunkyard = true;
+	}
+	const Ship *newShip = GameData::Ships().Get(modelName);
+	const Ship *usedShip = MostUsedModel(isJunkyard ? junkyard : used, modelName);
+	
+	if(!shipyard.Has(newShip) && !usedShip)
+		return false;
+	return true;
+}
+
+
+
 int ShipyardPanel::DrawItem(const string &name, const Point &point, int scrollY) const
 {
-	// Does the name end with JUNKYARD_SHIP_SUFFIX?
 	string modelName = name;
 	bool isJunkyard = false;
 	if (Format::EndsWith(name, Ship::JUNKYARD_SHIP_SUFFIX))
@@ -95,7 +130,7 @@ int ShipyardPanel::DrawItem(const string &name, const Point &point, int scrollY)
 		return NOT_DRAWN;
 	
 	// The ship we put into "zones" will become the "selectedShip" when this zone is clicked.
-	zones.emplace_back(point.X(), point.Y(), SHIP_SIZE / 2, SHIP_SIZE / 2, shipToDraw, scrollY);
+	zones.emplace_back(point, Point(SHIP_SIZE-2, SHIP_SIZE-2), shipToDraw, scrollY);
 	// If it's the same as "selectedShip" then this tile is selected.
 	int retVal = (selectedShip && shipToDraw == selectedShip) ? SELECTED : DRAWN;
 	
@@ -162,8 +197,12 @@ int ShipyardPanel::DrawDetails(const Point &center) const
 		info.DrawAttributes(drawPoint);
 		drawPoint.Y() += info.AttributesHeight() + 10;
 		
+		FillShader::Fill(drawPoint + Point(DETAILS_WIDTH/2,0), Point(DETAILS_WIDTH, 1), COLOR_DIVIDERS);		
+		
 		info.DrawOutfits(drawPoint);
 		drawPoint += Point(0, info.OutfitsHeight() + 10);
+		
+		FillShader::Fill(drawPoint + Point(DETAILS_WIDTH/2,0), Point(DETAILS_WIDTH, 1), COLOR_DIVIDERS);
 		
 		info.DrawDescription(drawPoint);
 		drawPoint += Point(0, info.DescriptionHeight() + 10);

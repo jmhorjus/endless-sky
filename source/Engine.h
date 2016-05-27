@@ -73,7 +73,6 @@ public:
 	
 	
 private:
-	void DrawMiniMap() const;
 	void EnterSystem();
 	
 	void ThreadEntryPoint();
@@ -152,6 +151,8 @@ private:
 	int grudgeTime = 0;
 	
 	AsteroidField asteroids;
+	
+	int alarmTime = 0;
 	double flash = 0.;
 	bool doFlash = false;
 	bool doEnter = false;

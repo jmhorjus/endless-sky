@@ -44,6 +44,8 @@ public:
 protected:
 	virtual int TileSize() const override;
 	virtual int DrawPlayerShipInfo(const Point &point) const override;
+	virtual int DrawCargoHoldInfo(const Point &point) const override;	
+	virtual bool HasItem(const std::string &name) const override;
 	virtual int DrawItem(const std::string &name, const Point &point, int scrollY) const override;
 	virtual int DividerOffset() const override;
 	virtual int DetailWidth() const override;
@@ -68,7 +70,7 @@ private:
 	void Refill();
 	void BuyAsCargoPrompt(std::string message);
 	void BuyAsCargoCallback();
-	
+	bool BuyAsCargo();
 	
 private:
 	// This is how many of each outfit we have sold to this particular outfitter

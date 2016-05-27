@@ -21,6 +21,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "FontSet.h"
 #include "Format.h"
 #include "GameData.h"
+#include "InfoPanel.h"
 #include "Outfit.h"
 #include "OutfitInfoDisplay.h"
 #include "Planet.h"
@@ -101,29 +102,55 @@ int OutfitterPanel::DrawPlayerShipInfo(const Point &point) const
 	info.DrawAttributes(drawPoint);
 	drawPoint.Y() += info.AttributesHeight();
 	
+	FillShader::Fill(drawPoint + Point(DETAILS_WIDTH/2,0), Point(DETAILS_WIDTH, 1), COLOR_DIVIDERS);	
+	
 	info.DrawDescription(drawPoint);
 	drawPoint.Y() += info.DescriptionHeight();
+
+	FillShader::Fill(drawPoint + Point(DETAILS_WIDTH/2,0), Point(DETAILS_WIDTH, 1), COLOR_DIVIDERS);	
+
+	info.DrawOutfits(drawPoint);
+	drawPoint.Y() += info.OutfitsHeight();	
 	
 	return drawPoint.Y() - point.Y();
 }
 
 
 
-int OutfitterPanel::DrawItem(const string &name, const Point &point, int scrollY) const
+int OutfitterPanel::DrawCargoHoldInfo(const Point &point) const
+{
+	Point drawPoint = point + Point(10,0);
+	
+	drawPoint.Y() += InfoPanel::DrawCargoHold(player.Cargo(), drawPoint , Point(DETAILS_WIDTH - 20, 20), 0, nullptr);	
+	
+	return drawPoint.Y() - point.Y();
+}
+
+
+
+bool OutfitterPanel::HasItem(const std::string &name) const
 {
 	const Outfit *outfit = GameData::Outfits().Get(name);
-	bool hasOutfit = (outfitter.Has(outfit) || available.Find(outfit) || player.Cargo().GetOutfitCount(outfit));
-	if(!hasOutfit)
-		for(const Ship *ship : playerShips)
-			if(ship->OutfitCount(outfit))
-			{
-				hasOutfit = true;
-				break;
-			}
-	if(!hasOutfit)
-		return NOT_DRAWN;
+	if(outfitter.Has(outfit) || available.Find(outfit) || player.Cargo().GetOutfitCount(outfit))
+		return true;
 	
-	zones.emplace_back(point.X(), point.Y(), OUTFIT_SIZE / 2, OUTFIT_SIZE / 2, outfit, scrollY);
+	for(const Ship *ship : playerShips)
+		if(ship->OutfitCount(outfit))
+			return true;
+	
+	return false;
+}
+
+
+
+int OutfitterPanel::DrawItem(const string &name, const Point &point, int scrollY) const
+{
+	if(!HasItem(name))
+		return NOT_DRAWN;
+		
+	const Outfit *outfit = GameData::Outfits().Get(name);
+	
+	zones.emplace_back(point, Point(OUTFIT_SIZE-2, OUTFIT_SIZE-2), outfit, scrollY);
 	if(point.Y() + OUTFIT_SIZE / 2 < Screen::Top() || point.Y() - OUTFIT_SIZE / 2 > Screen::Bottom())
 		return (selectedOutfit && outfit == selectedOutfit) ? SELECTED : DRAWN;
 	
@@ -153,11 +180,11 @@ int OutfitterPanel::DrawItem(const string &name, const Point &point, int scrollY
 			buyLabel = "buy used("+to_string(available.GetTotalCount(outfit))+"): " + Format::Number(cost);
 		else if (!outfitter.Has(outfit))
 			buyLabel = "in stock: " + to_string(available.GetTotalCount(outfit));
-			
+				
 		if (95 * outfit->Cost() >= 100 * cost)
 		{
 			Font saleFont = FontSet::Get(18);
-			std::string saleLabel = "[SALE! "+Format::Percent(outfit->Cost()-cost, outfit->Cost())+" OFF!]";
+			std::string saleLabel = cost ? "[SALE! "+Format::Percent(outfit->Cost()-cost, outfit->Cost())+" OFF!]" : "[FREE! PLEASE TAKE!]";
 			Point pos = point + Point(-saleFont.Width(saleLabel) / 2, -OUTFIT_SIZE / 2 + 26);
 			saleFont.Draw(saleLabel, pos, bright);
 		}
@@ -307,7 +334,7 @@ int OutfitterPanel::DrawDetails(const Point &center) const
 
 bool OutfitterPanel::CanBuy() const
 {
-	if(!planet || !selectedOutfit || !playerShip)
+	if(!planet || !selectedOutfit)
 		return false;
 	
 	bool isInCargo = player.Cargo().GetOutfitCount(selectedOutfit);
@@ -325,6 +352,9 @@ bool OutfitterPanel::CanBuy() const
 	
 	if(HasLicense(selectedOutfit->Name()))
 		return false;
+	
+	if(!playerShip)
+		return true;
 	
 	for(const Ship *ship : playerShips)
 		if(ShipCanBuy(ship, selectedOutfit))
@@ -354,7 +384,7 @@ void OutfitterPanel::Buy()
 			}
 			return;
 		}
-	
+		
 		// Special case: licenses.
 		if(IsLicense(selectedOutfit->Name()))
 		{
@@ -366,7 +396,14 @@ void OutfitterPanel::Buy()
 			}
 			return;
 		}
-	
+		
+		// If no ships are selected, buy the outfit and put it in cargo.
+		if(!playerShip)
+		{
+			BuyAsCargo();
+			continue;
+		}
+		
 		// Find the ships with the fewest number of these outfits.
 		vector<Ship *> shipsToOutfit;
 		int fewest = numeric_limits<int>::max();
@@ -880,18 +917,25 @@ void OutfitterPanel::BuyAsCargoCallback()
 	int modifier = Modifier();
 	for(int i = 0; i < modifier && player.Cargo().Free() >= selectedOutfit->Get("mass"); ++i)
 	{
-		if(!available.Find(selectedOutfit) && !outfitter.Has(selectedOutfit))
+		if(!BuyAsCargo())
 			break;
-		else if (available.Find(selectedOutfit))
-		{	// Buy lowest price used outfits first.
-			player.Accounts().AddCredits(-available.GetCost(selectedOutfit, 1, true));
-			player.Cargo().Transfer(selectedOutfit, -1, &available, true, 0);
-		}
-		else
-		{	// Buy new
-			player.Accounts().AddCredits(-selectedOutfit->Cost());
-			player.Cargo().Transfer(selectedOutfit, -1, nullptr, true, 0);				
-		}
-
 	}
+}
+
+
+
+// Return false if the outfit was not available or not enough credits.
+bool OutfitterPanel::BuyAsCargo()
+{
+	bool isAvailable = available.Find(selectedOutfit);
+	int64_t cost = isAvailable ? available.GetCost(selectedOutfit, 1, true) : selectedOutfit->Cost();
+	if((!isAvailable && !outfitter.Has(selectedOutfit)) 
+		|| cost > player.Accounts().Credits())
+		return false;
+	else
+	{	// Buy lowest price used outfits first, otherwise buy new. 
+		player.Accounts().AddCredits(-cost);
+		player.Cargo().Transfer(selectedOutfit, -1, isAvailable ? &available : nullptr, true, 0);
+	}
+	return true;
 }
