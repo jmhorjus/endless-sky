@@ -268,12 +268,18 @@ void Engine::Step(bool isActive)
 			doEnter = false;
 			events.emplace_back(flagship, flagship, ShipEvent::JUMP);
 		}
-		if(flagship->IsEnteringHyperspace() || flagship->Commands().Has(Command::WAIT))
+		if(flagship->IsEnteringHyperspace()
+				|| (flagship->Commands().Has(Command::WAIT) && !flagship->IsHyperspacing()))
 		{
 			if(jumpCount < 100)
 				++jumpCount;
-			jumpInProgress[0] = flagship->GetSystem();
-			jumpInProgress[1] = flagship->GetTargetSystem();
+			const System *from = flagship->GetSystem();
+			const System *to = flagship->GetTargetSystem();
+			if(from && to && from != to)
+			{
+				jumpInProgress[0] = from;
+				jumpInProgress[1] = to;
+			}
 		}
 		else if(jumpCount > 0)
 			--jumpCount;
@@ -364,7 +370,7 @@ void Engine::Step(bool isActive)
 	
 	// Create the planet labels.
 	labels.clear();
-	if(currentSystem)
+	if(currentSystem && Preferences::Has("Show planet labels"))
 	{
 		for(const StellarObject &object : currentSystem->Objects())
 		{
@@ -606,7 +612,7 @@ void Engine::Draw() const
 			PointerShader::Draw(center, targetAngle, 10., 10., radius, Color(1.));
 		}
 	}
-	if(jumpCount)
+	if(jumpCount && Preferences::Has("Show mini-map"))
 		MapPanel::DrawMiniMap(player, .5 * min(1., jumpCount / 30.), jumpInProgress, step);
 	
 	// Draw ammo status.
@@ -1105,7 +1111,8 @@ void Engine::CalculateStep()
 		--alarmTime;
 	else if(hasHostiles && !hadHostiles)
 	{
-		Audio::Play(Audio::Get("alarm"));
+		if(Preferences::Has("Warning siren"))
+			Audio::Play(Audio::Get("alarm"));
 		alarmTime = 180;
 		hadHostiles = true;
 	}
