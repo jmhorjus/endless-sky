@@ -152,9 +152,11 @@ void AI::UpdateKeys(PlayerInfo &player, Command &clickCommands, bool isActive)
 		Messages::Add(moveToMe ? "Your fleet is gathering around your flagship."
 			: "Your fleet is no longer gathering around your flagship.");
 	}
-	if(sharedTarget.lock() && sharedTarget.lock()->IsDisabled())
-		if(!killDisabledSharedTarget || sharedTarget.lock()->IsDestroyed())
-			sharedTarget.reset();
+	target = sharedTarget.lock();
+	if(target && target->IsDisabled() && (!killDisabledSharedTarget || target->IsDestroyed()))
+		sharedTarget.reset();
+	if(target && (target->GetSystem() != flagship->GetSystem() || !target->IsTargetable()))
+		sharedTarget.reset();
 }
 
 
@@ -393,14 +395,14 @@ void AI::Step(const list<shared_ptr<Ship>> &ships, const PlayerInfo &player)
 		// the current system can fire.
 		if(isPresent)
 		{
-			command |= AutoFire(*it, ships);
-			
 			// Each ship only switches targets twice a second, so that it can
 			// focus on damaging one particular ship.
 			targetTurn = (targetTurn + 1) & 31;
-			if(targetTurn == step || !target || !target->IsTargetable()
+			if(targetTurn == step || !target || !target->IsTargetable() || target->IsDestroyed()
 					|| (target->IsDisabled() && personality.Disables()))
 				it->SetTargetShip(FindTarget(*it, ships));
+			
+			command |= AutoFire(*it, ships);
 		}
 		
 		double targetDistance = numeric_limits<double>::infinity();
@@ -842,7 +844,7 @@ void AI::MoveIndependent(Ship &ship, Command &command) const
 
 
 
-void AI::MoveEscort(Ship &ship, Command &command)
+void AI::MoveEscort(Ship &ship, Command &command) const
 {
 	const Ship &parent = *ship.GetParent();
 	bool hasFuelCapacity = ship.Attributes().Get("fuel capacity");
@@ -902,6 +904,8 @@ void AI::MoveEscort(Ship &ship, Command &command)
 				command |= Command::JUMP;
 		}
 	}
+	else if(ship.IsYours() && moveToMe)
+		CircleAround(ship, command, parent);
 	else
 		KeepStation(ship, command, parent);
 }
