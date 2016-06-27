@@ -601,7 +601,7 @@ void Ship::Place(Point position, Point velocity, Angle angle)
 	ionization = 0.;
 	disruption = 0.;
 	slowness = 0.;
-	cloak = sprite.IsEmpty();
+	isInvisible = sprite.IsEmpty();
 	jettisoned.clear();
 	hyperspaceCount = 0;
 	hyperspaceType = 0;
@@ -1050,9 +1050,7 @@ bool Ship::Move(list<Effect> &effects, list<Flotsam> &flotsam)
 			hyperspaceSystem = GetTargetSystem();
 	}
 	
-	if(sprite.IsEmpty())
-		cloak = 1.;
-	else
+	if(!isInvisible)
 	{
 		double cloakingSpeed = attributes.Get("cloak");
 		bool canCloak = (zoom == 1. && !isDisabled && !hyperspaceCount && cloakingSpeed
@@ -1074,6 +1072,10 @@ bool Ship::Move(list<Effect> &effects, list<Flotsam> &flotsam)
 		--pilotError;
 	else if(pilotOkay)
 		--pilotOkay;
+	else if(isDisabled)
+	{
+		// If the ship is disabled, don't show a warning message due to missing crew.
+	}
 	else if(requiredCrew && static_cast<int>(Random::Int(requiredCrew)) >= Crew())
 	{
 		pilotError = 30;
@@ -1186,7 +1188,11 @@ bool Ship::Move(list<Effect> &effects, list<Flotsam> &flotsam)
 	// Boarding:
 	if(isBoarding && (commands.Has(Command::FORWARD | Command::BACK) || commands.Turn()))
 		isBoarding = false;
-	shared_ptr<const Ship> target = (CanBeCarried() ? GetParent() : GetTargetShip());
+	shared_ptr<const Ship> target = GetTargetShip();
+	// If this is a fighter or drone and it is not assisting someone at the
+	// moment, its boarding target should be its parent ship.
+	if(CanBeCarried() && !(target && target == GetShipToAssist()))
+		target = GetParent();
 	if(target && !isDisabled)
 	{
 		Point dp = (target->position - position);
@@ -1532,7 +1538,7 @@ bool Ship::CannotAct() const
 
 double Ship::Cloaking() const
 {
-	return cloak;
+	return isInvisible ? 1. : cloak;
 }
 
 
@@ -1723,9 +1729,12 @@ void Ship::Recharge(bool atSpaceport)
 	
 	if(!personality.IsDerelict())
 	{
-		shields = attributes.Get("shields");
-		hull = attributes.Get("hull");
-		energy = attributes.Get("energy capacity");
+		if(atSpaceport || attributes.Get("shield generation"))
+			shields = attributes.Get("shields");
+		if(atSpaceport || attributes.Get("hull repair rate"))
+			hull = attributes.Get("hull");
+		if(atSpaceport || attributes.Get("energy generation"))
+			energy = attributes.Get("energy capacity");
 	}
 	heat = IdleHeat();
 	ionization = 0.;
@@ -2101,7 +2110,7 @@ const CargoHold &Ship::Cargo() const
 
 
 // Display box effects from jettisoning this much cargo.
-void Ship::Jettison(const std::string &commodity, int tons)
+void Ship::Jettison(const string &commodity, int tons)
 {
 	cargo.Transfer(commodity, tons);
 	
@@ -2550,10 +2559,13 @@ void Ship::CreateExplosion(list<Effect> &effects, bool spread)
 
 
 // Place a "spark" effect, like ionization or disruption.
-void Ship::CreateSparks(std::list<Effect> &effects, const string &name, double amount)
+void Ship::CreateSparks(list<Effect> &effects, const string &name, double amount)
 {
 	if(forget)
 		return;
+	
+	// Limit the number of sparks, depending on the size of the sprite.
+	amount = min(amount, sprite.Width() * sprite.Height() * .0001);
 
 	const Effect *effect = GameData::Effects().Get(name);
 	while(true)

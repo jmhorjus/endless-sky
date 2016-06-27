@@ -813,7 +813,10 @@ void Engine::CalculateStep()
 		// Note that engine flares are handled separately, so that they will be
 		// drawn immediately under the ship.
 		if(!(*it)->Move(effects, flotsam))
+		{
+			eventQueue.emplace_back(nullptr, *it, ShipEvent::DESTROY);
 			it = ships.erase(it);
+		}
 		else
 		{
 			if(&**it != flagship)
@@ -1278,7 +1281,7 @@ void Engine::CalculateStep()
 				if(sum < 0)
 				{
 					shared_ptr<Ship> ship = person.GetShip();
-					ship->Recharge(true);
+					ship->Recharge();
 					ship->SetName(it.first);
 					ship->SetGovernment(person.GetGovernment());
 					ship->SetPersonality(person.GetPersonality());

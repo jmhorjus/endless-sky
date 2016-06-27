@@ -200,7 +200,9 @@ void WrappedText::SetText(const char *it, size_t length)
 
 void WrappedText::Wrap()
 {
-	assert(font);
+	height = 0;
+	if(text.empty() || !font)
+		return;
 	
 	// Do this as a finite state machine.
 	Word word;
